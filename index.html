@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gourmet Bite Order Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      background: white;
+      padding: 20px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    select, input[type="checkbox"], input[type="number"], input[type="text"] {
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 10px;
+    }
+    .submit-btn, .remove-btn {
+      background-color: #d4a373;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .remove-btn {
+      background-color: #e63946;
+      font-size: 14px;
+      padding: 5px 10px;
+    }
+    .order-item {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .summary {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+    }
+    .receipt {
+      display: none;
+      background: white;
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px dashed #333;
+    }
+    .receipt h3 {
+      text-align: center;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .receipt, .receipt * {
+        visibility: visible;
+      }
+      .receipt {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Gourmet Bite Order Form</h2>
+    <form id="orderForm">
+      <label>Customer Name:</label>
+      <input type="text" id="customerName" required>
+
+      <label>Pickup Time:</label>
+      <input type="time" id="pickupTime" required>
+
+      <div id="orderItems">
+        <div class="order-item">
+          <label>Quantity:</label>
+          <input type="number" name="quantity[]" value="1" min="1" required>
+
+          <label for="mainItem">Main Item</label>
+          <select name="mainItem[]" class="mainItem" required>
+            <option value="">-- Select --</option>
+            <option value="Classic Boerewors Roll" data-price="40">Classic Boerewors Roll - R40</option>
+            <option value="Steak Roll" data-price="60">Steak Roll - R60</option>
+            <option value="Chicken Roll" data-price="40">Chicken Roll - R40</option>
+            <option value="Nachos" data-price="50">Nachos - R50</option>
+            <option value="Potato Spud" data-price="40">Potato Spud - R40</option>
+            <option value="Nachos Chicken Potato Spud" data-price="60">Nachos Chicken Potato Spud - R60</option>
+            <option value="Nachos Steak Potato Spud" data-price="70">Nachos Steak Potato Spud - R70</option>
+            <option value="Fries Large" data-price="30">Fries (Large) - R30</option>
+          </select>
+
+          <label>Add-Ons:</label>
+          <input type="checkbox" name="addons0[]" value="Onion Bits" data-price="5"> Onion Bits (R5)<br>
+          <input type="checkbox" name="addons0[]" value="Tomato Relish" data-price="5"> Tomato Relish (R5)<br>
+          <input type="checkbox" name="addons0[]" value="Cheese Sauce" data-price="10"> Cheese Sauce (R10)<br>
+          <input type="checkbox" name="addons0[]" value="Mushroom Sauce" data-price="10"> Mushroom Sauce (R10)<br>
+          <input type="checkbox" name="addons0[]" value="Nachos Topping" data-price="20"> Nachos Topping (R20)<br>
+          <input type="checkbox" name="addons0[]" value="Macon Bits" data-price="10"> Macon Bits (R10)<br>
+          <input type="checkbox" name="addons0[]" value="Chicken" data-price="25"> Chicken (R25)<br>
+          <input type="checkbox" name="addons0[]" value="Mexican Steak Mince" data-price="25"> Mexican Steak Mince (R25)<br>
+          <input type="checkbox" name="addons0[]" value="Steak" data-price="30"> Steak (R30)<br>
+
+          <label>Sauces:</label>
+          <input type="checkbox" name="sauces0[]" value="Tomato"> Tomato<br>
+          <input type="checkbox" name="sauces0[]" value="Mustard"> Mustard<br>
+          <input type="checkbox" name="sauces0[]" value="Gourmet"> Gourmet<br>
+          <input type="checkbox" name="sauces0[]" value="Chilli"> Chilli<br>
+          <input type="checkbox" name="sauces0[]" value="BBQ"> BBQ<br>
+
+          <label>Special Instructions:</label>
+          <textarea name="notes[]" placeholder="E.g. No onions, extra cheese..."></textarea>
+
+          <button type="button" class="remove-btn" onclick="removeItem(this)">Remove Item</button>
+        </div>
+      </div>
+
+      <button type="button" class="submit-btn" onclick="addItem()">+ Add Another Item</button>
+      <br><br>
+      <button type="submit" class="submit-btn">Submit Order</button>
+    </form>
+
+    <div class="summary">
+      Order Total: R<span id="orderTotal">0</span>
+    </div>
+
+    <div class="receipt" id="receipt"></div>
+  </div>
+
+  <script>
+    let itemIndex = 1;
+
+    function addItem() {
+      const orderItems = document.getElementById('orderItems');
+      const clone = orderItems.children[0].cloneNode(true);
+
+      clone.querySelectorAll('input[type="checkbox"]').forEach(input => {
+        const name = input.name.replace(/\d+/, itemIndex);
+        input.name = name;
+        input.checked = false;
+      });
+
+      clone.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0;
+      });
+
+      clone.querySelector('textarea').value = '';
+      clone.querySelector('input[type="number"]').value = 1;
+
+      orderItems.appendChild(clone);
+      itemIndex++;
+    }
+
+    function removeItem(button) {
+      const allItems = document.querySelectorAll('#orderItems .order-item');
+      if (allItems.length > 1) {
+        button.closest('.order-item').remove();
+        calculateTotal();
+      } else {
+        alert("You must have at least one item in the order.");
+      }
+    }
+
+    function calculateTotal() {
+      let total = 0;
+      document.querySelectorAll('#orderItems .order-item').forEach((item) => {
+        const quantity = parseInt(item.querySelector('input[type="number"]').value || 1);
+        const mainItem = item.querySelector('select');
+        const basePrice = parseInt(mainItem.options[mainItem.selectedIndex]?.dataset.price || 0);
+        let addOnTotal = 0;
+
+        item.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          if (cb.checked && cb.dataset.price) {
+            addOnTotal += parseInt(cb.dataset.price);
+          }
+        });
+
+        total += quantity * (basePrice + addOnTotal);
+      });
+
+      document.getElementById('orderTotal').textContent = total;
+      return total;
+    }
+
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const total = calculateTotal();
+      const receipt = document.getElementById('receipt');
+      const customerName = document.getElementById('customerName').value.trim();
+      const pickupTime = document.getElementById('pickupTime').value;
+      let receiptHTML = `<h3>Order Receipt</h3><p><strong>Customer:</strong> ${customerName}</p><p><strong>Pickup Time:</strong> ${pickupTime}</p><ul>`;
+
+      document.querySelectorAll('#orderItems .order-item').forEach(item => {
+        const quantity = parseInt(item.querySelector('input[type="number"]').value);
+        const mainItem = item.querySelector('select');
+        const mainText = mainItem.options[mainItem.selectedIndex].text;
+
+        let addOns = [];
+        item.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          if (cb.checked) addOns.push(cb.value);
+        });
+
+        receiptHTML += `<li>${quantity} x ${mainText}<br> Add-ons: ${addOns.join(', ')}</li>`;
+      });
+
+      receiptHTML += `</ul><p><strong>Total: R${total}</strong></p>`;
+
+      receipt.innerHTML = receiptHTML;
+      receipt.style.display = 'block';
+
+      window.print();
+      this.reset();
+      document.getElementById('orderItems').innerHTML = document.getElementById('orderItems').children[0].outerHTML;
+      itemIndex = 1;
+      document.getElementById('orderTotal').textContent = '0';
+    });
+
+    document.addEventListener('input', function(e) {
+      if (e.target.closest('#orderForm')) {
+        calculateTotal();
+      }
+    });
+  </script>
+</body>
+</html>
